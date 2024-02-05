@@ -32,7 +32,7 @@ export class AuthService {
 
 
     //2Tutorial  
-    async authMe(person: string, pass: string) {
+    async authMe(person: string, pass: string) {debugger
         let personInfo = {userName: person, password: pass};
     
         await this.signalrService.hubConnection?.invoke("authMe", personInfo)
