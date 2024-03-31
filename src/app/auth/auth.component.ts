@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { SignalrService } from '../signalr.service';
+import { SignalrService, User } from '../signalr.service';
 import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './auth.service';
@@ -54,20 +54,24 @@ async authMe(person: string, pass: string) {debugger
 
 //3Tutorial
 authMeListenerSuccess() { 
-  debugger
-  this.signalrService.hubConnection?.on("authMeResponseSuccess", (person: any) => {
-      debugger
-      console.log(person.id);
-      console.log(person.name);
-
-      localStorage.setItem("personId", person.id);
-      this.signalrService.personName = person.name;
+  this.signalrService.hubConnection?.on("authMeResponseSuccess", (user:User) => {
+      console.log(user);
+      this.signalrService.userData = {...user};
+      localStorage.setItem("UserId", user.id!);
       this.authService.isAuthenticated = true;
       console.log("Login successful!");
       this.signalrService.router.navigateByUrl("/home");
   });
 }
-
+reauthMeListener() {
+  this.signalrService.hubConnection?.on("reauthMeResponse", (user:User) => {
+    console.log(user);
+    this.signalrService.userData = {...user};
+      this.authService.isAuthenticated = true;
+      console.log("Re-authenticated!");
+      if (this.signalrService.router.url == "/auth") this.signalrService.router.navigateByUrl("/home");
+  });
+}
 //2Tutorial
 authMeListenerFail() {
   this.signalrService.hubConnection?.on("authMeResponseFail", () => {
